@@ -37,7 +37,24 @@ class CDKPipelineStack(Stack):
             connection_arn="arn:aws:codeconnections:ap-southeast-1:058264068484:connection/db1d7cc2-7cce-4e51-a9c9-8f0a4eb951f6",
         )
 
+        test_git_input = pipelines.CodePipelineSource.connection(
+            repo_string='anhquyen18/java-infrastructures',
+            branch='test',
+            connection_arn="arn:aws:codeconnections:ap-southeast-1:058264068484:connection/db1d7cc2-7cce-4e51-a9c9-8f0a4eb951f6",
+        )
+
         synth_step = pipelines.ShellStep(
+            id="Synth",
+            install_commands=[
+                'pip install -r requirements.txt'
+            ],
+            commands=[
+                'npx cdk synth'
+            ],
+            input=git_input
+        )
+
+        test_synth_step = pipelines.ShellStep(
             id="Synth",
             install_commands=[
                 'pip install -r requirements.txt'
@@ -55,11 +72,24 @@ class CDKPipelineStack(Stack):
             synth=synth_step,
         )
 
+        test_pipeline = pipelines.CodePipeline(
+            self, 'CDKTestCodePipeline',
+            self_mutation=False,
+            code_pipeline=code_pipeline,
+            synth=synth_step,
+        )
+
         deployment_wave = pipeline.add_wave("DeploymentWave")
 
         deployment_wave.add_stage(DeploymentStage(
             self, 'Dev',
             env_name='dev',
+            env=(Environment(account='058264068484', region='ap-southeast-1')),
+        ))
+
+        deployment_wave.add_stage(DeploymentStage(
+            self, 'Test',
+            env_name='test',
             env=(Environment(account='058264068484', region='ap-southeast-1')),
         ))
 
