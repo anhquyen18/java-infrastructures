@@ -62,7 +62,7 @@ class CDKPipelineStack(Stack):
             commands=[
                 'npx cdk synth'
             ],
-            input=git_input
+            input=test_git_input
         )
 
         pipeline = pipelines.CodePipeline(
@@ -76,22 +76,26 @@ class CDKPipelineStack(Stack):
             self, 'CDKTestCodePipeline',
             self_mutation=False,
             code_pipeline=code_pipeline,
-            synth=synth_step,
+            synth=test_synth_step,
         )
 
         deployment_wave = pipeline.add_wave("DeploymentWave")
-
         deployment_wave.add_stage(DeploymentStage(
             self, 'Dev',
             env_name='dev',
             env=(Environment(account='058264068484', region='ap-southeast-1')),
         ))
 
-        deployment_wave.add_stage(DeploymentStage(
+        test_deployment_wave = test_pipeline.add_wave("TestDeploymentWave")
+        test_deployment_wave.add_stage(DeploymentStage(
             self, 'Test',
             env_name='test',
             env=(Environment(account='058264068484', region='ap-southeast-1')),
         ))
+
+
+
+
 
         # deployment_wave.add_stage(DevStage(
         #     self, 'DevStage',
