@@ -4,7 +4,7 @@ import os
 import aws_cdk as cdk
 
 from java_infrastructures.java_infrastructures_stack import JavaInfrastructuresStack
-
+from cdk_pipeline_stack.cdk_pipeline_stack import CDKPipelineStack
 
 app = cdk.App()
 JavaInfrastructuresStack(app, "JavaInfrastructuresStack",
@@ -20,9 +20,15 @@ JavaInfrastructuresStack(app, "JavaInfrastructuresStack",
     # Uncomment the next line if you know exactly what Account and Region you
     # want to deploy the stack to. */
 
-    #env=cdk.Environment(account='123456789012', region='us-east-1'),
+    # env=cdk.Environment(account='058264068484', region='ap-southeast-1'),
+    # stack_name='github-codepipeline-stack'
 
     # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
     )
+
+CDKPipelineStack(app, "CDKPipelineStack",
+                 env=cdk.Environment(account='058264068484', region='ap-southeast-1'),
+                 stack_name='github-codepipeline-stack'
+                 )
 
 app.synth()

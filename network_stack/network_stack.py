@@ -3,7 +3,7 @@ from aws_cdk import (
     aws_ec2 as ec2,
 )
 from constructs import Construct
-import java_infrastructures.config as config
+import network_stack.config as config
 
 
 class NetworkStack(Stack):
