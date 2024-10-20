@@ -11,10 +11,12 @@ from constructs import Construct
 import cdk_pipeline_stack.config as config
 from network_stack.network_stack import NetworkStack
 
+
 class DeploymentStage(Stage):
     def __init__(self, scope: Construct, id: str, env: Environment, env_name: str, **kwargs) -> None:
         super().__init__(scope, id, env=env, **kwargs)
-        NetworkStack(self, env_name + '-NetworkStack', env=env, env_name=env_name + '-NetworkStack')
+        NetworkStack(self, 'NetworkStack', env=env, env_name=env_name, stack_name=env_name + 'NetworkStack')
+
 
 class CDKPipelineStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
@@ -56,7 +58,7 @@ class CDKPipelineStack(Stack):
         deployment_wave = pipeline.add_wave("DeploymentWave")
 
         deployment_wave.add_stage(DeploymentStage(
-            self, 'DevStage',
+            self, 'Dev',
             env_name='dev',
             env=(Environment(account='058264068484', region='ap-southeast-1')),
         ))
