@@ -9,7 +9,7 @@ import network_stack.config as config
 class NetworkStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, env_name: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
-        self.env_name = env_name
+        self.env_name = env_name + '-'
         self.java_world_vpc = ec2.Vpc(self, self.env_name + config.VPC,
                                       vpc_name=self.env_name + config.VPC,
                                       ip_addresses=ec2.IpAddresses.cidr("10.0.0.0/16"),
