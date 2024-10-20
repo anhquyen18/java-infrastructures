@@ -4,6 +4,8 @@ from aws_cdk import (
     # aws_sqs as sqs,
 )
 from constructs import Construct
+from java_infrastructures.network_stack import NetworkStack
+
 
 class JavaInfrastructuresStack(Stack):
 
@@ -11,7 +13,7 @@ class JavaInfrastructuresStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
 
         # The code that defines your stack goes here
-
+        NetworkStack(self, construct_id='NetworkStack', stack_name='NetworkStack')
         # example resource
         # queue = sqs.Queue(
         #     self, "JavaInfrastructuresQueue",
