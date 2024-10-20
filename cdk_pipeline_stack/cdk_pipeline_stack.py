@@ -11,41 +11,28 @@ from constructs import Construct
 import cdk_pipeline_stack.config as config
 from network_stack.network_stack import NetworkStack
 
-class DevStage(Stage):
-    def __init__(self, scope: Construct, id: str, env: Environment, **kwargs) -> None:
+class DeploymentStage(Stage):
+    def __init__(self, scope: Construct, id: str, env: Environment, env_name: str, **kwargs) -> None:
         super().__init__(scope, id, env=env, **kwargs)
-        NetworkStack(self, 'NetworkStack', env=env, stack_name="NetworkStack")
-
+        NetworkStack(self, env_name + '-NetworkStack', env=env, env_name=env_name + '-NetworkStack')
 
 class CDKPipelineStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # Create a CodeBuild for CDK
-        # build_project = codebuild.PipelineProject(self, config.BUILD_PROJECT_ID,
-        #                                           environment={
-        #                                               "build_image": codebuild.LinuxBuildImage.STANDARD_5_0,
-        #                                               "privileged": True,
-        #                                           },
-        #                                           build_spec=codebuild.BuildSpec.from_source_filename("buildspec.yml"))
-
-        # Create Pipeline
-        # pipeline = codepipeline.Pipeline(self, config.PIPELINE_ID, pipeline_name=config.PIPELINE_ID,
-        #                                  cross_account_keys=False)
+        # Create a pipeline for CDK app
         code_pipeline = codepipeline.Pipeline(
             self, config.PIPELINE_ID,
             pipeline_name=config.PIPELINE_ID,
             cross_account_keys=False
         )
-        # add source action
-        # source_output = codepipeline.Artifact()
-        # build_output = codepipeline.Artifact()
 
+        # Create pipeline source
+        # Need to create a connection between AWS and Github account by Console before create this one
         git_input = pipelines.CodePipelineSource.connection(
             repo_string='anhquyen18/java-infrastructures',
-            branch='main',
-            connection_arn="arn:aws:codeconnections:ap-southeast-1:058264068484:connection/04735f98-97e7-48d3-9cd7"
-                           "-32a67747277b",
+            branch='dev',
+            connection_arn="arn:aws:codeconnections:ap-southeast-1:058264068484:connection/db1d7cc2-7cce-4e51-a9c9-8f0a4eb951f6",
         )
 
         synth_step = pipelines.ShellStep(
@@ -66,9 +53,15 @@ class CDKPipelineStack(Stack):
             synth=synth_step,
         )
 
-        deployment_wave = pipeline.add_wave("DeploymentDevWave")
+        deployment_wave = pipeline.add_wave("DeploymentWave")
 
-        deployment_wave.add_stage(DevStage(
+        deployment_wave.add_stage(DeploymentStage(
             self, 'DevStage',
-            env=(Environment(account='058264068484', region='ap-southeast-1'))
+            env_name='dev',
+            env=(Environment(account='058264068484', region='ap-southeast-1')),
         ))
+
+        # deployment_wave.add_stage(DevStage(
+        #     self, 'DevStage',
+        #     env=(Environment(account='058264068484', region='ap-southeast-1', stage='dev'))
+        # ))

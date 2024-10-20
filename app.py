@@ -7,7 +7,7 @@ from java_infrastructures.java_infrastructures_stack import JavaInfrastructuresS
 from cdk_pipeline_stack.cdk_pipeline_stack import CDKPipelineStack
 
 app = cdk.App()
-JavaInfrastructuresStack(app, "JavaInfrastructuresStack",
+# JavaInfrastructuresStack(app, "JavaInfrastructuresStack",
     # If you don't specify 'env', this stack will be environment-agnostic.
     # Account/Region-dependent features and context lookups will not work,
     # but a single synthesized template can be deployed anywhere.
@@ -24,7 +24,7 @@ JavaInfrastructuresStack(app, "JavaInfrastructuresStack",
     # stack_name='github-codepipeline-stack'
 
     # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
-    )
+    # )
 
 CDKPipelineStack(app, "CDKPipelineStack",
                  env=cdk.Environment(account='058264068484', region='ap-southeast-1'),

@@ -7,10 +7,11 @@ import network_stack.config as config
 
 
 class NetworkStack(Stack):
-    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, env_name: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
-
-        self.java_world_vpc = ec2.Vpc(self, config.VPC, ip_addresses=ec2.IpAddresses.cidr("10.0.0.0/16"),
+        self.env_name = env_name
+        self.java_world_vpc = ec2.Vpc(self, self.env_name + config.VPC,
+                                      ip_addresses=ec2.IpAddresses.cidr("10.0.0.0/16"),
                                       nat_gateways=0, subnet_configuration=[],
                                       enable_dns_support=True, enable_dns_hostnames=True)
 
@@ -43,7 +44,7 @@ class NetworkStack(Stack):
 
     def attach_nat_gateway(self):
         # Create and attach nat gateway to the Vpc
-        nat_gateway = ec2.CfnNatGateway(self, config.NAT_GATEWAY,
+        nat_gateway = ec2.CfnNatGateway(self, self.env_name + config.NAT_GATEWAY,
                                         allocation_id=self.elastic_ip.attr_allocation_id,
                                         subnet_id=self.subnet_id_to_subnet_map[config.PUBLIC_SUBNET].ref)
         return nat_gateway
@@ -64,7 +65,7 @@ class NetworkStack(Stack):
                 self, subnet_id, vpc_id=self.java_world_vpc.vpc_id,
                 cidr_block=subnet_config['cidr_block'],
                 availability_zone=subnet_config['availability_zone'],
-                tags=[{'key': 'Name', 'value': subnet_id}],
+                tags=[{'key': 'Name', 'value': self.env_name + subnet_id}],
                 map_public_ip_on_launch=subnet_config['map_public_ip_on_launch'],
             )
             self.subnet_id_to_subnet_map[subnet_id] = subnet
@@ -74,12 +75,12 @@ class NetworkStack(Stack):
         for route_table_id in config.ROUTE_TABLES_ID_TO_ROUTES_MAP:
             self.route_table_id_to_route_table_map[route_table_id] = ec2.CfnRouteTable(
                 self, route_table_id, vpc_id=self.java_world_vpc.vpc_id,
-                tags=[{'key': 'Name', 'value': route_table_id}],
+                tags=[{'key': 'Name', 'value': self.env_name + route_table_id}],
             )
 
     def attach_internet_gateway(self) -> ec2.CfnInternetGateway:
         # Create and attach internet gateway to the VPC
-        internet_gateway = ec2.CfnInternetGateway(self, config.INTERNET_GATEWAY)
+        internet_gateway = ec2.CfnInternetGateway(self, self.env_name + config.INTERNET_GATEWAY)
         ec2.CfnVPCGatewayAttachment(self, 'internet-gateway-attachment',
                                     vpc_id=self.java_world_vpc.vpc_id,
                                     internet_gateway_id=internet_gateway.ref)

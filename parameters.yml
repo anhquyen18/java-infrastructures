@@ -1,0 +1,20 @@
+dev:
+  account: '058264068484'
+  region: 'ap-southeast-1'
+  instance_type: 't2.micro'
+  min_capacity: 1
+  max_capacity: 2
+
+test:
+  account: '058264068484'
+  region: 'ap-southeast-1'
+  instance_type: 't2.small'
+  min_capacity: 2
+  max_capacity: 4
+
+prod:
+  account: '058264068484'
+  region: 'ap-southeast-1'
+  instance_type: 't2.medium'
+  min_capacity: 3
+  max_capacity: 6
