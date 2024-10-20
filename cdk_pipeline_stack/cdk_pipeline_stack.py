@@ -29,6 +29,12 @@ class CDKPipelineStack(Stack):
             cross_account_keys=False
         )
 
+        test_code_pipeline = codepipeline.Pipeline(
+            self, config.PIPELINE_ID + '1',
+            pipeline_name=config.PIPELINE_ID+ '1',
+            cross_account_keys=False
+        )
+
         # Create pipeline source
         # Need to create a connection between AWS and Github account by Console before create this one
         git_input = pipelines.CodePipelineSource.connection(
@@ -55,7 +61,7 @@ class CDKPipelineStack(Stack):
         )
 
         test_synth_step = pipelines.ShellStep(
-            id="Test_Synth",
+            id="TestSynth",
             install_commands=[
                 'pip install -r requirements.txt'
             ],
@@ -75,7 +81,7 @@ class CDKPipelineStack(Stack):
         test_pipeline = pipelines.CodePipeline(
             self, 'CDKTestCodePipeline',
             self_mutation=False,
-            code_pipeline=code_pipeline,
+            code_pipeline=test_code_pipeline,
             synth=test_synth_step,
         )
 
@@ -92,10 +98,6 @@ class CDKPipelineStack(Stack):
             env_name='test',
             env=(Environment(account='058264068484', region='ap-southeast-1')),
         ))
-
-
-
-
 
         # deployment_wave.add_stage(DevStage(
         #     self, 'DevStage',
