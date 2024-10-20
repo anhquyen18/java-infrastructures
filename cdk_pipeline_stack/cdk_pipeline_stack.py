@@ -11,10 +11,10 @@ from constructs import Construct
 import cdk_pipeline_stack.config as config
 from network_stack.network_stack import NetworkStack
 
-class DeployStage(Stage):
+class DevStage(Stage):
     def __init__(self, scope: Construct, id: str, env: Environment, **kwargs) -> None:
         super().__init__(scope, id, env=env, **kwargs)
-        NetworkStack(self, 'ResourceStack', env=env, stack_name="resource-stack-deploy")
+        NetworkStack(self, 'NetworkStack', env=env, stack_name="NetworkStack")
 
 
 class CDKPipelineStack(Stack):
@@ -33,8 +33,8 @@ class CDKPipelineStack(Stack):
         # pipeline = codepipeline.Pipeline(self, config.PIPELINE_ID, pipeline_name=config.PIPELINE_ID,
         #                                  cross_account_keys=False)
         code_pipeline = codepipeline.Pipeline(
-            self, "Pipeline",
-            pipeline_name="new-pipeline",
+            self, config.PIPELINE_ID,
+            pipeline_name=config.PIPELINE_ID,
             cross_account_keys=False
         )
         # add source action
@@ -60,15 +60,15 @@ class CDKPipelineStack(Stack):
         )
 
         pipeline = pipelines.CodePipeline(
-            self, 'CodePipeline',
+            self, 'CDKDevCodePipeline',
             self_mutation=False,
             code_pipeline=code_pipeline,
             synth=synth_step,
         )
 
-        deployment_wave = pipeline.add_wave("DeploymentWave")
+        deployment_wave = pipeline.add_wave("DeploymentDevWave")
 
-        deployment_wave.add_stage(DeployStage(
-            self, 'DeployStage',
+        deployment_wave.add_stage(DevStage(
+            self, 'DevStage',
             env=(Environment(account='058264068484', region='ap-southeast-1'))
         ))

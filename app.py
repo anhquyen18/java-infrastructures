@@ -28,7 +28,7 @@ JavaInfrastructuresStack(app, "JavaInfrastructuresStack",
 
 CDKPipelineStack(app, "CDKPipelineStack",
                  env=cdk.Environment(account='058264068484', region='ap-southeast-1'),
-                 stack_name='github-codepipeline-stack'
+                 stack_name='CDKPipelineStack'
                  )
 
 app.synth()
