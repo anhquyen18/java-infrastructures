@@ -55,7 +55,7 @@ class CDKPipelineStack(Stack):
         )
 
         test_synth_step = pipelines.ShellStep(
-            id="Synth",
+            id="Test_Synth",
             install_commands=[
                 'pip install -r requirements.txt'
             ],
