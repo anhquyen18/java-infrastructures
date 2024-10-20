@@ -38,11 +38,11 @@ class CDKPipelineStack(Stack):
             cross_account_keys=False
         )
         # add source action
-        source_output = codepipeline.Artifact()
-        build_output = codepipeline.Artifact()
+        # source_output = codepipeline.Artifact()
+        # build_output = codepipeline.Artifact()
 
         git_input = pipelines.CodePipelineSource.connection(
-            repo_string='anhquyen18/java-infrastructures.git',
+            repo_string='anhquyen18/java-infrastructures',
             branch='main',
             connection_arn="arn:aws:codeconnections:ap-southeast-1:058264068484:connection/04735f98-97e7-48d3-9cd7"
                            "-32a67747277b",
