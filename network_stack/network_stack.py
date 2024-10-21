@@ -47,7 +47,7 @@ class NetworkStack(Stack):
         # Create and attach nat gateway to the Vpc
         nat_gateway = ec2.CfnNatGateway(self, self.env_name + config.NAT_GATEWAY,
                                         allocation_id=self.elastic_ip.attr_allocation_id,
-                                        subnet_id=self.subnet_id_to_subnet_map[config.PUBLIC_SUBNET].ref)
+                                        subnet_id=self.subnet_id_to_subnet_map[config.PUBLIC_SUBNET_1a].ref)
         return nat_gateway
 
     def create_subnet_route_table_associations(self):
