@@ -14,6 +14,7 @@ import cdk_pipeline_stack.config as config
 from network_stack.network_stack import NetworkStack
 from helpers import read_yml_file
 from java_pipeline_stack.java_pipeline_stack import JavaPipelineStack
+from ec2_stack.ec2_stack import EC2Stack
 
 
 class DeploymentStage(Stage):
@@ -22,10 +23,8 @@ class DeploymentStage(Stage):
         super().__init__(scope, id, **kwargs)
         network_stack = NetworkStack(self, env_name.capitalize() + 'NetworkStack', env=env, env_name=env_name,
                                      stack_name=env_name.capitalize() + 'NetworkStack')
-
-        java_pipeline_stack = JavaPipelineStack(self, env_name.capitalize() + 'JavaPipelineStack', env=env,
-                                                env_name=env_name, manual_approve=manual_approve,
-                                                stack_name=env_name.capitalize() + 'JavaPipelineStack')
+        ec2_stack = EC2Stack(self, env_name.capitalize() + 'EC2Stack', env=env, env_name=env_name,
+                             stack_name=env_name.capitalize() + 'EC2Stack', network_stack=network_stack)
 
 
 class CDKPipelineStack(Stack):

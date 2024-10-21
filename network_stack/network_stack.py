@@ -9,12 +9,20 @@ import network_stack.config as config
 class NetworkStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, env_name: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
-        self.env_name = env_name + '-quyen-'
-        self.java_world_vpc = ec2.Vpc(self, self.env_name + config.VPC,
-                                      vpc_name=self.env_name + config.VPC,
-                                      ip_addresses=ec2.IpAddresses.cidr("10.0.0.0/16"),
-                                      nat_gateways=0, subnet_configuration=[],
-                                      enable_dns_support=True, enable_dns_hostnames=True)
+        self.env_name = env_name + '-'
+        self.vpc = ec2.Vpc(self, self.env_name + config.VPC,
+                           vpc_name=self.env_name + config.VPC,
+                           ip_addresses=ec2.IpAddresses.cidr("10.0.0.0/16"),
+                           nat_gateways=0,
+                           enable_dns_support=True, enable_dns_hostnames=True,
+                           subnet_configuration=[
+                               ec2.SubnetConfiguration(
+                                   name="public-subnet",
+                                   subnet_type=ec2.SubnetType.PUBLIC,
+                                   cidr_mask=24
+                               ),
+                           ]
+                           )
 
         self.elastic_ip = ec2.CfnEIP(self, "EIP")
         self.internet_gateway = self.attach_internet_gateway()
@@ -63,7 +71,7 @@ class NetworkStack(Stack):
         # Create subnets of the VPC
         for subnet_id, subnet_config in config.SUBNET_CONFIGURATION.items():
             subnet = ec2.CfnSubnet(
-                self, subnet_id, vpc_id=self.java_world_vpc.vpc_id,
+                self, subnet_id, vpc_id=self.vpc.vpc_id,
                 cidr_block=subnet_config['cidr_block'],
                 availability_zone=subnet_config['availability_zone'],
                 tags=[{'key': 'Name', 'value': self.env_name + subnet_id}],
@@ -75,7 +83,7 @@ class NetworkStack(Stack):
         # Create route tables
         for route_table_id in config.ROUTE_TABLES_ID_TO_ROUTES_MAP:
             self.route_table_id_to_route_table_map[route_table_id] = ec2.CfnRouteTable(
-                self, route_table_id, vpc_id=self.java_world_vpc.vpc_id,
+                self, route_table_id, vpc_id=self.vpc.vpc_id,
                 tags=[{'key': 'Name', 'value': self.env_name + route_table_id}],
             )
 
@@ -83,6 +91,6 @@ class NetworkStack(Stack):
         # Create and attach internet gateway to the VPC
         internet_gateway = ec2.CfnInternetGateway(self, self.env_name + config.INTERNET_GATEWAY)
         ec2.CfnVPCGatewayAttachment(self, 'internet-gateway-attachment',
-                                    vpc_id=self.java_world_vpc.vpc_id,
+                                    vpc_id=self.vpc.vpc_id,
                                     internet_gateway_id=internet_gateway.ref)
         return internet_gateway
