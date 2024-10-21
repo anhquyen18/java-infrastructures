@@ -23,8 +23,8 @@ class DeploymentStage(Stage):
         super().__init__(scope, id, **kwargs)
         network_stack = NetworkStack(self, env_name.capitalize() + 'NetworkStack', env=env, env_name=env_name,
                                      stack_name=env_name.capitalize() + 'NetworkStack')
-        ec2_stack = EC2Stack(self, env_name.capitalize() + 'EC2Stack', env=env, env_name=env_name,
-                             stack_name=env_name.capitalize() + 'EC2Stack', network_stack=network_stack)
+        # ec2_stack = EC2Stack(self, env_name.capitalize() + 'EC2Stack', env=env, env_name=env_name,
+        #                      stack_name=env_name.capitalize() + 'EC2Stack', network_stack=network_stack)
 
 
 class CDKPipelineStack(Stack):

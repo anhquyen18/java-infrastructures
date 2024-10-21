@@ -45,5 +45,4 @@ class EC2Stack(Stack):
         asg.connections.allow_from(lb, ec2.Port.tcp(80), "Allow traffic from ALB")
 
         CfnOutput(self, "LoadBalancerDNS",
-
                   value=lb.load_balancer_dns_name)
