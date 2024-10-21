@@ -38,26 +38,30 @@ PRIVATE_SUBNET_1b = PROJECT_NAME + '-' + 'private-subnet-1b'
 
 SUBNET_CONFIGURATION = {
     PUBLIC_SUBNET_1a: {
+        'type': 'Public',
         'availability_zone': 'ap-southeast-1a',
-        'cidr_block': '10.0.1.0/24',
+        'cidr_block': '10.0.51.0/24',
         'map_public_ip_on_launch': True,
         'route_table_id': PUBLIC_ROUTE_TABLE,
     },
     PUBLIC_SUBNET_1b: {
+        'type': 'Public',
         'availability_zone': 'ap-southeast-1a',
-        'cidr_block': '10.0.2.0/24',
+        'cidr_block': '10.0.52.0/24',
         'map_public_ip_on_launch': True,
         'route_table_id': PUBLIC_ROUTE_TABLE,
     },
     PRIVATE_SUBNET_1a: {
+        'type': 'Private',
         'availability_zone': 'ap-southeast-1b',
-        'cidr_block': '10.0.3.0/24',
+        'cidr_block': '10.0.53.0/24',
         'map_public_ip_on_launch': False,
         'route_table_id': PRIVATE_ROUTE_TABLE,
     },
     PRIVATE_SUBNET_1b: {
+        'type': 'Private',
         'availability_zone': 'ap-southeast-1b',
-        'cidr_block': '10.0.0.0/24',
+        'cidr_block': '10.0.50.0/24',
         'map_public_ip_on_launch': False,
         'route_table_id': PRIVATE_ROUTE_TABLE,
     }

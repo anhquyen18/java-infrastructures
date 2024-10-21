@@ -13,7 +13,18 @@ class NetworkStack(Stack):
         self.vpc = ec2.Vpc(self, self.env_name + config.VPC,
                            vpc_name=self.env_name + config.VPC,
                            ip_addresses=ec2.IpAddresses.cidr("10.0.0.0/16"),
-                           subnet_configuration=[],
+                           subnet_configuration=[
+                               ec2.SubnetConfiguration(
+                                   name="PublicSubnet",
+                                   subnet_type=ec2.SubnetType.PUBLIC,
+                                   cidr_mask=24  # CIDR cho mỗi public subnet
+                               ),
+                               ec2.SubnetConfiguration(
+                                   name="PrivateSubnet",
+                                   subnet_type=ec2.SubnetType.PRIVATE_WITH_NAT,
+                                   cidr_mask=24  # CIDR cho mỗi private subnet
+                               )
+                           ],
                            enable_dns_support=True, enable_dns_hostnames=True)
 
         self.elastic_ip = ec2.CfnEIP(self, "EIP")
@@ -66,7 +77,8 @@ class NetworkStack(Stack):
                 self, subnet_id, vpc_id=self.vpc.vpc_id,
                 cidr_block=subnet_config['cidr_block'],
                 availability_zone=subnet_config['availability_zone'],
-                tags=[{'key': 'Name', 'value': self.env_name + subnet_id}],
+                tags=[{'key': 'Name', 'value': self.env_name + subnet_id}, {'key': 'aws-cdk:subnet-type',
+                                                                            'value': subnet_config['type']}],
                 map_public_ip_on_launch=subnet_config['map_public_ip_on_launch'],
             )
             self.subnet_id_to_subnet_map[subnet_id] = subnet
