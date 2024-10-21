@@ -57,7 +57,7 @@ SUBNET_CONFIGURATION = {
     },
     PRIVATE_SUBNET_1b: {
         'availability_zone': 'ap-southeast-1b',
-        'cidr_block': '10.0.4.0/24',
+        'cidr_block': '10.0.0.0/24',
         'map_public_ip_on_launch': False,
         'route_table_id': PRIVATE_ROUTE_TABLE,
     }
