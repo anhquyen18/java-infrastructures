@@ -23,8 +23,8 @@ class DeploymentStage(Stage):
         super().__init__(scope, id, **kwargs)
         network_stack = NetworkStack(self, env_name.capitalize() + 'NetworkStack', env=env, env_name=env_name,
                                      stack_name=env_name.capitalize() + 'NetworkStack')
-        ec2_stack = EC2Stack(self, env_name.capitalize() + 'EC2Stack', env=env, env_name=env_name,
-                             stack_name=env_name.capitalize() + 'EC2Stack', network_stack=network_stack)
+        # ec2_stack = EC2Stack(self, env_name.capitalize() + 'EC2Stack', env=env, env_name=env_name,
+        #                      stack_name=env_name.capitalize() + 'EC2Stack', network_stack=network_stack)
 
 
 class CDKPipelineStack(Stack):
@@ -74,13 +74,13 @@ class CDKPipelineStack(Stack):
         deployment_wave = pipeline.add_wave("DeploymentWave")
         if manual_approve:
             deployment_wave.add_stage(DeploymentStage(
-                self, env_name.capitalize(),
+                self, env_name.capitalize() + "Deployment",
                 env_name=env_name, manual_approve=manual_approve,
                 env=Environment(account=parameters['account'], region=parameters['region'])
             ), pre=[pipelines.ManualApprovalStep("DeployStack")])
         else:
             deployment_wave.add_stage(DeploymentStage(
-                self, env_name.capitalize(),
+                self, env_name.capitalize() + "Deployment",
                 env_name=env_name, manual_approve=manual_approve,
                 env=Environment(account=parameters['account'], region=parameters['region'])
             ))

@@ -21,7 +21,7 @@ class EC2Stack(Stack):
         asg = autoscaling.AutoScalingGroup(self, env_name.capitalize() + ec2_config.ASG_ID,
                                            vpc=network_stack.vpc,
                                            instance_type=ec2.InstanceType("t2.micro"),
-                                           machine_image=ec2.MachineImage.latest_amazon_linux(),
+                                           machine_image=ec2.MachineImage.latestAmazonLinux2,
                                            min_capacity=1,
                                            max_capacity=3)
 
