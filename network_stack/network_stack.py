@@ -22,10 +22,10 @@ class NetworkStack(Stack):
         self.route_table_id_to_route_table_map = {}
         self.create_route_tables()
         self.create_subnets()
-        # self.create_subnet_route_table_associations()
-        # self.nat_gateway = self.attach_nat_gateway()
-        # self.nat_gateway.add_dependency(self.elastic_ip)
-        # self.create_routes()
+        self.create_subnet_route_table_associations()
+        self.nat_gateway = self.attach_nat_gateway()
+        self.nat_gateway.add_dependency(self.elastic_ip)
+        self.create_routes()
 
     def create_routes(self):
         # Create routes of the route table

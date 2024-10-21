@@ -1,39 +1,26 @@
-import os
-
 from aws_cdk import (
     Stack,
     aws_codepipeline as codepipeline,
-    aws_codepipeline_actions as codepipeline_actions,
-    aws_codebuild as codebuild,
     pipelines,
-    Stage,
     Environment,
+    Stage,
 )
 from constructs import Construct
-import cdk_pipeline_stack.config as config
-from network_stack.network_stack import NetworkStack
 from helpers import read_yml_file
-from java_pipeline_stack.java_pipeline_stack import JavaPipelineStack
-
+import java_pipeline_stack.config as config
+from ec2_stack.ec2_stack import EC2Stack
 
 class DeploymentStage(Stage):
-    def __init__(self, scope: Construct, id: str,
-                 env: Environment, env_name: str, manual_approve: bool, **kwargs) -> None:
+    def __init__(self, scope: Construct, id: str, env: Environment, env_name: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
-        network_stack = NetworkStack(self, env_name.capitalize() + 'NetworkStack', env=env, env_name=env_name,
-                                     stack_name=env_name.capitalize() + 'NetworkStack')
-
-        java_pipeline_stack = JavaPipelineStack(self, env_name.capitalize() + 'JavaPipelineStack', env=env,
-                                                env_name=env_name, manual_approve=manual_approve,
-                                                stack_name=env_name.capitalize() + 'JavaPipelineStack')
+        EC2Stack(self,'DevEC2')
 
 
-class CDKPipelineStack(Stack):
+class JavaPipelineStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, env_name: str, manual_approve: bool, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
         self.env_name_id = env_name + '-'
 
-        # Read parameters for separate environment from parameters.yml
         parameters = read_yml_file.read_yml_file('parameters.yml', env_name)
 
         # Create a pipeline for CDK
@@ -76,12 +63,12 @@ class CDKPipelineStack(Stack):
         if manual_approve:
             deployment_wave.add_stage(DeploymentStage(
                 self, env_name.capitalize(),
-                env_name=env_name, manual_approve=manual_approve,
+                env_name=env_name,
                 env=Environment(account=parameters['account'], region=parameters['region'])
             ), pre=[pipelines.ManualApprovalStep("DeployStack")])
         else:
             deployment_wave.add_stage(DeploymentStage(
                 self, env_name.capitalize(),
-                env_name=env_name, manual_approve=manual_approve,
+                env_name=env_name,
                 env=Environment(account=parameters['account'], region=parameters['region'])
             ))

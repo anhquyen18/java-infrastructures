@@ -33,7 +33,7 @@ ROUTE_TABLES_ID_TO_ROUTES_MAP = {
 # subnets
 PUBLIC_SUBNET_1a = PROJECT_NAME + '-' + 'public-subnet-1a'
 PUBLIC_SUBNET_1b = PROJECT_NAME + '-' + 'public-subnet-1b'
-PRIVATE_SUBNET_1a = PROJECT_NAME + '-' + 'public-subnet-1a'
+PRIVATE_SUBNET_1a = PROJECT_NAME + '-' + 'private-subnet-1a'
 PRIVATE_SUBNET_1b = PROJECT_NAME + '-' + 'private-subnet-1b'
 
 SUBNET_CONFIGURATION = {
@@ -55,6 +55,7 @@ SUBNET_CONFIGURATION = {
         'map_public_ip_on_launch': False,
         'route_table_id': PRIVATE_ROUTE_TABLE,
     },
+
     PRIVATE_SUBNET_1b: {
         'availability_zone': 'ap-southeast-1b',
         'cidr_block': '10.0.0.0/24',
