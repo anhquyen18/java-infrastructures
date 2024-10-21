@@ -29,10 +29,8 @@ class EC2Stack(Stack):
         lb = elb.ApplicationLoadBalancer(self, env_name.capitalize() + ec2_config.ELB_ID,
                                          vpc=network_stack.vpc,
                                          internet_facing=True,
-                                         vpc_subnets=[
-                                             network_stack.subnet_id_to_subnet_map[network_config.PUBLIC_SUBNET_1a],
-                                             network_stack.subnet_id_to_subnet_map[
-                                                 network_config.PUBLIC_SUBNET_1b]]
+                                         vpc_subnets=ec2.SubnetSelection(
+                                             subnet_type=ec2.SubnetType.PUBLIC)
                                          )
 
         # Add listener to Load Balancer
@@ -47,4 +45,5 @@ class EC2Stack(Stack):
         asg.connections.allow_from(lb, ec2.Port.tcp(80), "Allow traffic from ALB")
 
         CfnOutput(self, "LoadBalancerDNS",
+
                   value=lb.load_balancer_dns_name)
