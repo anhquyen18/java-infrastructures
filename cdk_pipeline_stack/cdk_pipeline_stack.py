@@ -17,13 +17,13 @@ from helpers import read_yml_file
 
 class DeploymentStage(Stage):
     def __init__(self, scope: Construct, id: str, env: Environment, env_name: str, **kwargs) -> None:
-        super().__init__(scope, id,  **kwargs)
+        super().__init__(scope, id, **kwargs)
         NetworkStack(self, env_name.capitalize() + 'NetworkStack', env=env, env_name=env_name,
                      stack_name=env_name.capitalize() + 'NetworkStack')
 
 
 class CDKPipelineStack(Stack):
-    def __init__(self, scope: Construct, construct_id: str, env_name: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, env_name: str, manual_approve: bool, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
         self.env_name_id = env_name + '-'
 
@@ -67,8 +67,15 @@ class CDKPipelineStack(Stack):
 
         # Add deployment stage
         deployment_wave = pipeline.add_wave("DeploymentWave")
-        deployment_wave.add_stage(DeploymentStage(
-            self, env_name.capitalize(),
-            env_name=env_name,
-            env=Environment(account=parameters['account'], region=parameters['region'])
-        ), pre=[pipelines.ManualApprovalStep("DeployStack")])
+        if manual_approve:
+            deployment_wave.add_stage(DeploymentStage(
+                self, env_name.capitalize(),
+                env_name=env_name,
+                env=Environment(account=parameters['account'], region=parameters['region'])
+            ), pre=[pipelines.ManualApprovalStep("DeployStack")])
+        else:
+            deployment_wave.add_stage(DeploymentStage(
+                self, env_name.capitalize(),
+                env_name=env_name,
+                env=Environment(account=parameters['account'], region=parameters['region'])
+            ))
