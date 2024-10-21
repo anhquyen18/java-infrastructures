@@ -1,3 +1,5 @@
+import os
+
 from aws_cdk import (
     Stack,
     aws_codepipeline as codepipeline,
@@ -10,35 +12,42 @@ from aws_cdk import (
 from constructs import Construct
 import cdk_pipeline_stack.config as config
 from network_stack.network_stack import NetworkStack
+from helpers import read_yml_file
 
 
 class DeploymentStage(Stage):
     def __init__(self, scope: Construct, id: str, env: Environment, env_name: str, **kwargs) -> None:
-        super().__init__(scope, id, env=env, **kwargs)
-        NetworkStack(self, 'NetworkStack', env=env, env_name=env_name, stack_name=env_name + '-NetworkStack')
+        super().__init__(scope, id, **kwargs)
+        NetworkStack(self, env_name.capitalize() + 'NetworkStack', env=env, env_name=env_name,
+                     stack_name=env_name.capitalize() + 'NetworkStack')
 
 
 class CDKPipelineStack(Stack):
-    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, env_name: str, manual_approve: bool, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
+        self.env_name_id = env_name + '-'
 
-        # Create a pipeline for CDK app
+        # Read parameters for separate environment from parameters.yml
+        parameters = read_yml_file.read_yml_file('parameters.yml', env_name)
+
+        # Create a pipeline for CDK
         code_pipeline = codepipeline.Pipeline(
-            self, config.PIPELINE_ID,
-            pipeline_name=config.PIPELINE_ID,
+            self, env_name.capitalize() + config.PIPELINE_ID,
+            pipeline_name=self.env_name_id + config.PIPELINE_ID,
             cross_account_keys=False
         )
 
         # Create pipeline source
         # Need to create a connection between AWS and Github account by Console before create this one
         git_input = pipelines.CodePipelineSource.connection(
-            repo_string='anhquyen18/java-infrastructures',
-            branch='dev',
-            connection_arn="arn:aws:codeconnections:ap-southeast-1:058264068484:connection/db1d7cc2-7cce-4e51-a9c9-8f0a4eb951f6",
+            repo_string=config.REPO,
+            branch=env_name,
+            connection_arn=config.GITHUB_CONNECTION_ARN,
         )
 
+        # Create shell command stage
         synth_step = pipelines.ShellStep(
-            id="Synth",
+            id=env_name.capitalize() + "Synth",
             install_commands=[
                 'pip install -r requirements.txt'
             ],
@@ -48,22 +57,25 @@ class CDKPipelineStack(Stack):
             input=git_input
         )
 
+        # Add pipeline
         pipeline = pipelines.CodePipeline(
-            self, 'CDKDevCodePipeline',
+            self, env_name.capitalize() + 'CDKCodePipeline',
             self_mutation=False,
             code_pipeline=code_pipeline,
             synth=synth_step,
         )
 
+        # Add deployment stage
         deployment_wave = pipeline.add_wave("DeploymentWave")
-
-        deployment_wave.add_stage(DeploymentStage(
-            self, 'Dev',
-            env_name='dev',
-            env=(Environment(account='058264068484', region='ap-southeast-1')),
-        ))
-
-        # deployment_wave.add_stage(DevStage(
-        #     self, 'DevStage',
-        #     env=(Environment(account='058264068484', region='ap-southeast-1', stage='dev'))
-        # ))
+        if manual_approve:
+            deployment_wave.add_stage(DeploymentStage(
+                self, env_name.capitalize(),
+                env_name=env_name,
+                env=Environment(account=parameters['account'], region=parameters['region'])
+            ), pre=[pipelines.ManualApprovalStep("DeployStack")])
+        else:
+            deployment_wave.add_stage(DeploymentStage(
+                self, env_name.capitalize(),
+                env_name=env_name,
+                env=Environment(account=parameters['account'], region=parameters['region'])
+            ))
