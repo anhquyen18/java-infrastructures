@@ -13,9 +13,8 @@ class NetworkStack(Stack):
         self.vpc = ec2.Vpc(self, self.env_name + config.VPC,
                            vpc_name=self.env_name + config.VPC,
                            ip_addresses=ec2.IpAddresses.cidr("10.0.0.0/16"),
-                           nat_gateways=0,
-                           enable_dns_support=True, enable_dns_hostnames=True,
-                           )
+                           subnet_configuration=[],
+                           enable_dns_support=True, enable_dns_hostnames=True)
 
         self.elastic_ip = ec2.CfnEIP(self, "EIP")
         self.internet_gateway = self.attach_internet_gateway()
