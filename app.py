@@ -11,6 +11,7 @@ app = cdk.App()
 # Define environment params from parameters.yml
 dev_params = read_yml_file.read_yml_file('parameters.yml', 'dev')
 test_params = read_yml_file.read_yml_file('parameters.yml', 'test')
+prod_params = read_yml_file.read_yml_file('parameters.yml', 'prod')
 
 CDKPipelineStack(app, "DevCDKPipelineStack",
                  stack_name='DevCDKPipelineStack', env_name='dev',
@@ -20,5 +21,9 @@ CDKPipelineStack(app, "TestCDKPipelineStack",
                  stack_name='TestCDKPipelineStack', env_name='test',
                  manual_approve=True,
                  env=Environment(account=test_params['account'], region=test_params['region']))
+CDKPipelineStack(app, "ProdCDKPipelineStack",
+                 stack_name='ProdCDKPipelineStack', env_name='prod',
+                 manual_approve=True,
+                 env=Environment(account=prod_params['account'], region=prod_params['region']))
 
 app.synth()
