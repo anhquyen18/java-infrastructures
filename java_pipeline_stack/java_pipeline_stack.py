@@ -10,10 +10,11 @@ from helpers import read_yml_file
 import java_pipeline_stack.config as config
 from ec2_stack.ec2_stack import EC2Stack
 
+
 class DeploymentStage(Stage):
     def __init__(self, scope: Construct, id: str, env: Environment, env_name: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
-        EC2Stack(self,'DevEC2')
+        EC2Stack(self, 'DevEC2')
 
 
 class JavaPipelineStack(Stack):
@@ -26,7 +27,7 @@ class JavaPipelineStack(Stack):
         # Create a pipeline for CDK
         code_pipeline = codepipeline.Pipeline(
             self, env_name.capitalize() + config.PIPELINE_ID,
-            pipeline_name=self.env_name_id + config.PIPELINE_ID,
+            pipeline_name=self.env_name_id + config.PIPELINE_ID + 'trananhqueyn',
             cross_account_keys=False
         )
 
