@@ -7,7 +7,8 @@ from aws_cdk import (
 )
 from constructs import Construct
 from network_stack.network_stack import NetworkStack
-import ec2_stack.config as config
+import ec2_stack.config as ec2_config
+import network_stack.config as network_config
 
 
 class EC2Stack(Stack):
@@ -17,7 +18,7 @@ class EC2Stack(Stack):
         self.env_name_id = env_name + '-'
 
         # Create Scaling Group
-        asg = autoscaling.AutoScalingGroup(self, env_name.capitalize() + config.ASG_ID,
+        asg = autoscaling.AutoScalingGroup(self, env_name.capitalize() + ec2_config.ASG_ID,
                                            vpc=network_stack.vpc,
                                            instance_type=ec2.InstanceType("t2.micro"),
                                            machine_image=ec2.MachineImage.latest_amazon_linux(),
@@ -25,9 +26,13 @@ class EC2Stack(Stack):
                                            max_capacity=3)
 
         # Create Elastic Load Balancer (ELB)
-        lb = elb.ApplicationLoadBalancer(self, env_name.capitalize() + config.ELB_ID,
+        lb = elb.ApplicationLoadBalancer(self, env_name.capitalize() + ec2_config.ELB_ID,
                                          vpc=network_stack.vpc,
                                          internet_facing=True,
+                                         vpc_subnets=[
+                                             network_stack.subnet_id_to_subnet_map[network_config.PUBLIC_SUBNET_1a],
+                                             network_stack.subnet_id_to_subnet_map[
+                                                 network_config.PUBLIC_SUBNET_1b]]
                                          )
 
         # Add listener to Load Balancer

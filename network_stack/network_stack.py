@@ -15,13 +15,6 @@ class NetworkStack(Stack):
                            ip_addresses=ec2.IpAddresses.cidr("10.0.0.0/16"),
                            nat_gateways=0,
                            enable_dns_support=True, enable_dns_hostnames=True,
-                           subnet_configuration=[
-                               ec2.SubnetConfiguration(
-                                   name="public-subnet",
-                                   subnet_type=ec2.SubnetType.PUBLIC,
-                                   cidr_mask=24
-                               ),
-                           ]
                            )
 
         self.elastic_ip = ec2.CfnEIP(self, "EIP")
