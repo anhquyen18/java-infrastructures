@@ -10,17 +10,17 @@ class NetworkStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, env_name: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
         self.env_name = env_name + '-'
-        self.vpc = ec2.Vpc(self, self.env_name + config.VPC,
-                           vpc_name=self.env_name + config.VPC,
-                           ip_addresses=ec2.IpAddresses.cidr("10.0.0.0/16"),
-                           subnet_configuration=[],
-                           enable_dns_support=True, enable_dns_hostnames=True)
-
-        self.elastic_ip = ec2.CfnEIP(self, "EIP")
-        self.internet_gateway = self.attach_internet_gateway()
-        self.subnet_id_to_subnet_map = {}
-        self.route_table_id_to_route_table_map = {}
-        self.create_route_tables()
+        # self.vpc = ec2.Vpc(self, self.env_name + config.VPC,
+        #                    vpc_name=self.env_name + config.VPC,
+        #                    ip_addresses=ec2.IpAddresses.cidr("10.0.0.0/16"),
+        #                    subnet_configuration=[],
+        #                    enable_dns_support=True, enable_dns_hostnames=True)
+        #
+        # self.elastic_ip = ec2.CfnEIP(self, "EIP")
+        # self.internet_gateway = self.attach_internet_gateway()
+        # self.subnet_id_to_subnet_map = {}
+        # self.route_table_id_to_route_table_map = {}
+        # self.create_route_tables()
         # self.create_subnets()
         # self.create_subnet_route_table_associations()
         # self.nat_gateway = self.attach_nat_gateway()
